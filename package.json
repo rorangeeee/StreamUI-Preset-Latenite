@@ -1,0 +1,16 @@
+{
+  "name": "streamui-preset-latenite",
+  "version": "1.0.2",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "npm run check && vite build",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "interactjs": "^1.10.28",
+    "typescript": "latest",
+    "vite": "latest"
+  }
+}
