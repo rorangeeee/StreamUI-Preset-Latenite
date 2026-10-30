@@ -16,8 +16,20 @@ test('legacy titles, scene bindings and away text migrate once while preserving 
  assert.equal((await read('scene-settings/latenite__fullscreen.json')).titles.english[0],'Keep');
  assert.equal((await read('scene-settings/latenite__fullscreen.json')).titles.chinese[0],'个人标题');
  assert.equal((await read('scene-settings/latenite__away.json')).text1,'Away');
- assert.equal((await read('core-settings.json')).selectedSceneId,'latenite__away');
+ assert.equal((await read('core-settings.json')).selectedSceneId,'latenite__ultrawide');
+ assert.equal((await read('preset-settings/latenite.json')).controls.away,true);
  assert.deepEqual(await read('core-settings.v1.json'),core);
  await writeFile(path.join(root,'scene-settings/latenite__ultrawide.json'),'{}');
  assert.equal((await migrate(root)).migrated,false);assert.deepEqual(await read('scene-settings/latenite__ultrawide.json'),{});
+});
+test('a previous v2 away scene becomes a Host overlay without restoring cleared bindings',async()=>{
+ const root=path.resolve('.local/overlay-migration-'+randomUUID());await mkdir(path.join(root,'preset-migrations'),{recursive:true});await mkdir(path.join(root,'scene-settings'),{recursive:true});
+ await writeFile(path.join(root,'preset-migrations/latenite-v2.json'),'{"version":2}');
+ await writeFile(path.join(root,'core-settings.json'),JSON.stringify({formatVersion:2,activePresetId:'latenite',selectedSceneId:'latenite__away'}));
+ await writeFile(path.join(root,'scene-settings/latenite__ultrawide.json'),'{}');
+ await migrate(root);
+ const core=JSON.parse(await readFile(path.join(root,'core-settings.json'),'utf8'));
+ const shared=JSON.parse(await readFile(path.join(root,'preset-settings/latenite.json'),'utf8'));
+ assert.equal(core.selectedSceneId,'latenite__ultrawide');assert.equal(shared.controls.away,true);
+ assert.deepEqual(JSON.parse(await readFile(path.join(root,'scene-settings/latenite__ultrawide.json'),'utf8')),{});
 });

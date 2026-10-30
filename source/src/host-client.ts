@@ -29,7 +29,7 @@ export interface HostState {
   laplace: { state: string; error: string | null; localBridge: boolean; events: number; lastEventAt: string | null };
   obsUrl: string; configUrl: string; startup: boolean;
 }
-type VisualSettings = Pick<HostConfig, 'canvas' | 'layoutVersion' | 'layoutProfiles'>;
+type VisualSettings = Pick<HostConfig, 'canvas' | 'layoutVersion' | 'layoutProfiles'> & { controls: { away: boolean } };
 interface ObsStatus { state: string; scene: string | null; error: string | null }
 export class HostConnection extends EventTarget {
   state: HostState | null = null;
@@ -41,7 +41,7 @@ export class HostConnection extends EventTarget {
   private parameters: Record<string, Partial<SceneParameters & AwaySettings>> = {};
   private epoch = 0;
   private catalog = '';
-  private normalId: string | null = null;
+  private blockedCueId: string | null = null;
   private obsReady = false;
   private obs: ObsStatus = { state: 'disabled', scene: null, error: null };
   private audio: HostState['audio'] = { state: 'idle', error: null, deviceId: null, sampleRate: 48000, channels: 2, deviceSampleRate: 48000, frameRate: 0 };
@@ -97,26 +97,25 @@ export class HostConnection extends EventTarget {
       ]);
       if (epoch !== this.epoch) return;
       this.visuals = visuals; this.parameters = Object.fromEntries(parameters);
-      this.binding.configure(scenes.map(scene => ({ id: scene.id, name: this.parameters[scene.id]?.obsSceneName?.trim() ?? '' })), this.obs.scene, this.core!.scene.activeId);
+      this.binding.configure(scenes.filter(scene => scene.role !== 'overlay').map(scene => ({ id: scene.id, name: this.parameters[scene.id]?.obsSceneName?.trim() ?? '' })), this.obs.scene, this.core!.scene.activeId);
       this.sync();
     } catch (error) { console.error('LATENITE settings:', error); }
   }
   private sync(): void {
     if (!this.core || !this.visuals) return;
-    const core = this.core, current = core.scenes.find(scene => scene.id === core.scene.activeId);
-    if (!current) return;
-    if (current.view !== 'away') this.normalId = current.id;
-    const previous = core.scenes.find(scene => scene.id === core.scene.previousId && scene.view !== 'away');
-    const normal = current.view === 'away' ? previous ?? core.scenes.find(scene => scene.id === this.normalId) ?? core.scenes.find(scene => scene.view !== 'away') : current;
+    const core = this.core, normal = core.scenes.find(scene => scene.id === core.scene.activeId && scene.role !== 'overlay');
     if (!normal || !this.parameters[normal.id]) return;
     const values = this.parameters[normal.id] as SceneParameters;
     const away = this.parameters[core.scenes.find(scene => scene.view === 'away')?.id ?? ''] ?? {};
+    const covered = this.visuals.controls.away, playback = core.scene.playback;
+    if (covered) this.blockedCueId = playback?.id ?? null;
+    const transition = covered ? null : playback?.id === this.blockedCueId ? { ...playback, animate: false } : playback;
     const mode: StageMode = normal.view === '16:9' ? '16:9' : '21:9';
     this.state = {
       config: { ...this.visuals, ...values, layoutMode: mode, layout: this.visuals.layoutProfiles[mode] ?? null,
         audio: { enabled: core.plugins.some(plugin => plugin.id === 'desktop-audio' && plugin.enabled) },
-        away: { text1: '', text2: '', overlayOpacity: .9, ...away, enabled: current.view === 'away' } },
-      audio: this.audio, nowPlaying: this.track, transition: core.scene.playback, laplace: this.chat,
+        away: { text1: '', text2: '', overlayOpacity: .9, ...away, enabled: covered } },
+      audio: this.audio, nowPlaying: this.track, transition, laplace: this.chat,
       obsUrl: core.outputUrl, configUrl: core.configUrl, startup: core.startup,
     };
     this.dispatchEvent(new CustomEvent('state', { detail: this.state }));

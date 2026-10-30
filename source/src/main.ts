@@ -48,7 +48,7 @@ let previousLayout = '';
 let canvasWidth = STAGE_WIDTH, canvasHeight = STAGE_HEIGHT;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const renderer = new TransitionRenderer(surface, workspace, true);
-const away = new AwayOverlay(); surface.append(away);
+const away = new AwayOverlay(); away.classList.add('stage-away-overlay'); surface.after(away);
 let transitionVisuals = '';
 const transition = new TransitionPlayback<HostState>({
   apply: applyState,
@@ -60,7 +60,7 @@ const transition = new TransitionPlayback<HostState>({
   reset: () => renderer.reset(),
 });
 let transitionAnimation = 0, transitionTime = 0;
-let obsTransitionId: string | null = null;
+let playbackId: string | null = null;
 
 function fitCanvas(): void {
   workspace.style.setProperty('--ui-scale', String(Math.min(canvasWidth / STAGE_WIDTH, canvasHeight / STAGE_HEIGHT)));
@@ -68,6 +68,10 @@ function fitCanvas(): void {
     width: `${canvasWidth}px`, height: `${canvasHeight}px`,
   });
   Object.assign(surface.style, {
+    width: `${canvasWidth}px`, height: `${canvasHeight}px`,
+    transform: `scale(${Math.min(innerWidth / canvasWidth, innerHeight / canvasHeight)})`,
+  });
+  Object.assign(away.style, {
     width: `${canvasWidth}px`, height: `${canvasHeight}px`,
     transform: `scale(${Math.min(innerWidth / canvasWidth, innerHeight / canvasHeight)})`,
   });
@@ -114,14 +118,14 @@ function syncPresentation(resume = false): void {
     && (!initialized || (canvasWidth === config.canvas.width && canvasHeight === config.canvas.height));
   const signal = state.transition;
   const mode = config.layoutMode ?? '21:9';
-  if (signal && (signal.id !== obsTransitionId || resume)) {
-    obsTransitionId = signal.id;
+  if (signal && (signal.id !== playbackId || resume)) {
+    playbackId = signal.id;
     const elapsed = Math.max(0, Date.now() - signal.startedAt);
     transition.begin(mode, state, elapsed, signal.animate && animate && elapsed < TRANSITION_DURATION);
     // The next animation frame must not count time from an older run again.
     transitionTime = performance.now();
-  } else if (!signal && obsTransitionId !== null) {
-    obsTransitionId = null;
+  } else if (!signal && playbackId !== null) {
+    playbackId = null;
     transition.update(mode, state, false);
   } else transition.update(mode, state, transition.running);
   if (transition.running && !transitionAnimation) transitionAnimation = requestAnimationFrame(drawTransition);
