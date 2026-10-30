@@ -2,7 +2,7 @@ import './style.css';
 import './stage.css';
 import './stage-wide.css';
 import { StagePresentation } from './stage-presentation.ts';
-import './stream-marquee.ts';
+import { StreamMarquee } from './stream-marquee.ts';
 import './on-air-indicator.ts';
 import './barcode-code.ts';
 import './data-matrix-code.ts';
@@ -37,7 +37,7 @@ workspace.before(surface); surface.append(workspace);
 const presentation = new StagePresentation(workspace);
 const windows = new WindowManager(workspace, editor);
 const nowPlaying = document.querySelector<NowPlaying>('now-playing')!;
-new DetectionOverlays(workspace);
+const detections = new DetectionOverlays(workspace);
 const scopes = Array.from(document.querySelectorAll<AudioScope>('audio-scope'));
 let animation = 0;
 let previousTime = 0;
@@ -83,6 +83,9 @@ function applyState(state: HostState): void {
   canvasWidth = config.canvas.width; canvasHeight = config.canvas.height;
   fitCanvas();
   document.querySelector<KineticWordmark>('#bilingual-title')!.setTitles(config.titles?.english ?? ['TITLE'], config.titles?.chinese ?? ['标题']);
+  document.querySelector<KineticWordmark>('.brand-wordmark')!.setWords(config.brandWords);
+  for (const marquee of document.querySelectorAll<StreamMarquee>('stream-marquee')) marquee.setTexts(marquee.dataset.band === 'bottom-primary' ? config.marquees.primary : config.marquees.secondary);
+  detections.setLabels(config.labels);
   const layout = JSON.stringify([mode, config.canvas, config.layout]);
   if ((!editor && layout !== previousLayout) || !initialized || changedSize || changedMode) windows.restore(config.layout);
   previousLayout = layout;
@@ -109,18 +112,18 @@ function syncPresentation(resume = false): void {
   nowPlaying.update(state.nowPlaying);
   const animate = !editor && !document.hidden && !reducedMotion.matches
     && (!initialized || (canvasWidth === config.canvas.width && canvasHeight === config.canvas.height));
-  const signal = state.obs?.transition;
+  const signal = state.transition;
   const mode = config.layoutMode ?? '21:9';
   if (signal && (signal.id !== obsTransitionId || resume)) {
     obsTransitionId = signal.id;
     const elapsed = Math.max(0, Date.now() - signal.startedAt);
-    transition.begin(mode, state, elapsed, animate && elapsed < TRANSITION_DURATION);
+    transition.begin(mode, state, elapsed, signal.animate && animate && elapsed < TRANSITION_DURATION);
     // The next animation frame must not count time from an older run again.
     transitionTime = performance.now();
   } else if (!signal && obsTransitionId !== null) {
     obsTransitionId = null;
     transition.update(mode, state, false);
-  } else transition.update(mode, state, animate);
+  } else transition.update(mode, state, transition.running);
   if (transition.running && !transitionAnimation) transitionAnimation = requestAnimationFrame(drawTransition);
   else if (!transition.running) { cancelAnimationFrame(transitionAnimation); transitionAnimation = 0; transitionTime = 0; }
 }

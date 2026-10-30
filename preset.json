@@ -1,65 +1,81 @@
 {
   "formatVersion": 1,
-  "sdkVersion": 1,
+  "sdkVersion": 2,
   "id": "latenite",
   "name": "LATENITE 多场景",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "3840 × 2160 双布局，保留弹幕、字标、音频可视化、暂离条带与像素转场。",
   "defaultScene": "ultrawide",
-  "awayScene": "away",
-  "settingsPage": "settings.html",
   "defaults": "defaults.json",
   "scenes": [
     {
       "id": "ultrawide",
       "name": "21:9 · 超宽主画面",
       "view": "21:9",
-      "obsScene": "STREAM_v2_34",
       "entry": "ui/index.html",
       "width": 3840,
       "height": 2160,
-      "runtimeGroup": "overlay"
+      "runtimeGroup": "overlay",
+      "settingsPage": "settings/scene.html",
+      "defaults": "defaults/ultrawide.json"
     },
     {
       "id": "fullscreen",
       "name": "16:9 · 全画布叠加",
       "view": "16:9",
-      "obsScene": "STREAM_v2_27",
       "entry": "ui/index.html",
       "width": 3840,
       "height": 2160,
-      "runtimeGroup": "overlay"
+      "runtimeGroup": "overlay",
+      "settingsPage": "settings/scene.html",
+      "defaults": "defaults/fullscreen.json"
     },
     {
       "id": "away",
       "name": "暂离",
       "view": "away",
-      "obsScene": "",
       "entry": "ui/index.html",
       "width": 3840,
       "height": 2160,
-      "runtimeGroup": "overlay"
+      "runtimeGroup": "overlay",
+      "settingsPage": "settings/scene.html",
+      "defaults": "defaults/away.json"
     }
   ],
   "plugins": [
     {
       "id": "desktop-audio",
-      "minimumVersion": "1.0.0",
+      "minimumVersion": "1.0.2",
       "required": true,
       "repository": "https://github.com/rorangeeee/StreamUI-Plugin-DesktopAudio.git",
-      "ref": "v1.0.1"
+      "ref": "3bedd09b691ad449a6f1489f7531992c6f34ccbb"
     },
     {
       "id": "system-media",
-      "minimumVersion": "1.0.0",
+      "minimumVersion": "1.0.2",
       "required": true,
       "repository": "https://github.com/rorangeeee/StreamUI-Plugin-SystemMedia.git",
-      "ref": "v1.0.1"
+      "ref": "81a90f5b355838e30f45ac43d5437d5adf846952"
+    },
+    {
+      "id": "obs-scenes",
+      "minimumVersion": "1.0.0",
+      "required": true,
+      "repository": "https://github.com/rorangeeee/StreamUI-Plugin-ObsScenes.git",
+      "ref": "ffb4eb32ad6c04ef78521762a30a4d9a854155ac"
+    },
+    {
+      "id": "laplace",
+      "minimumVersion": "1.0.0",
+      "required": true,
+      "repository": "https://github.com/rorangeeee/StreamUI-Plugin-Laplace.git",
+      "ref": "c40b913ed910ee7552a6c9f951e3659d40438c1e"
     }
   ],
   "repository": "https://github.com/rorangeeee/StreamUI-Preset-Latenite",
   "build": {
     "kind": "vite",
     "output": "ui"
-  }
+  },
+  "sidebarPage": "sidebar.html"
 }

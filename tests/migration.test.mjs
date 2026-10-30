@@ -1,0 +1,23 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdir,writeFile,readFile} from 'node:fs/promises';
+import {randomUUID} from 'node:crypto';
+import path from 'node:path';
+import {migrate} from '../scripts/migrate-settings.mjs';
+test('legacy titles, scene bindings and away text migrate once while preserving scene edits',async()=>{
+ const root=path.resolve('.local/migration-test-'+randomUUID());await mkdir(path.join(root,'preset-settings'),{recursive:true});await mkdir(path.join(root,'scene-settings'),{recursive:true});
+ const core={activePresetId:'latenite',selectedSceneId:'latenite__ultrawide',away:{enabled:true},scenes:[{id:'latenite__ultrawide',obsScene:'Game'}]};
+ await writeFile(path.join(root,'core-settings.json'),JSON.stringify(core));
+ await writeFile(path.join(root,'preset-settings/latenite.json'),JSON.stringify({titles:{english:['Personal'],chinese:['个人标题']},away:{text1:'Away',text2:'Soon',overlayOpacity:.6}}));
+ await writeFile(path.join(root,'scene-settings/latenite__fullscreen.json'),JSON.stringify({titles:{english:['Keep']}}));
+ assert.ok((await migrate(root)).migrated);
+ const read=async file=>JSON.parse(await readFile(path.join(root,file),'utf8'));
+ assert.equal((await read('scene-settings/latenite__ultrawide.json')).obsSceneName,'Game');
+ assert.equal((await read('scene-settings/latenite__fullscreen.json')).titles.english[0],'Keep');
+ assert.equal((await read('scene-settings/latenite__fullscreen.json')).titles.chinese[0],'个人标题');
+ assert.equal((await read('scene-settings/latenite__away.json')).text1,'Away');
+ assert.equal((await read('core-settings.json')).selectedSceneId,'latenite__away');
+ assert.deepEqual(await read('core-settings.v1.json'),core);
+ await writeFile(path.join(root,'scene-settings/latenite__ultrawide.json'),'{}');
+ assert.equal((await migrate(root)).migrated,false);assert.deepEqual(await read('scene-settings/latenite__ultrawide.json'),{});
+});

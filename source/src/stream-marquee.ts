@@ -11,7 +11,7 @@ export class StreamMarquee extends HTMLElement {
   private halos!: HTMLDivElement;
   private blooms: HTMLDivElement[] = [];
   private unit!: HTMLDivElement;
-  private band: typeof MARQUEE_BANDS[keyof typeof MARQUEE_BANDS] = MARQUEE_BANDS['bottom-primary'];
+  private band: { speed: number; direction: 'left' | 'right'; text: readonly string[] } = MARQUEE_BANDS['bottom-primary'];
   private observer: ResizeObserver | null = null;
   private playback: Animation | null = null;
   private glow: Animation[] = [];
@@ -67,6 +67,13 @@ export class StreamMarquee extends HTMLElement {
     this.pauseGlowTimer(); this.glow.forEach(animation => animation.cancel()); this.glow = [];
     this.reducedMotion.removeEventListener('change', this.refresh);
     document.removeEventListener('visibilitychange', this.visibility);
+  }
+  setTexts(text: readonly string[]): void {
+    if (!this.unit || JSON.stringify(this.band.text) === JSON.stringify(text)) return;
+    this.band = { ...this.band, text };
+    this.setAttribute('aria-label', text.join(' · '));
+    this.unit.replaceChildren(...text.map(value => { const span = document.createElement('span'); span.className = 'marquee-item'; span.textContent = value; return span; }));
+    this.content.replaceChildren(this.unit); this.signature = ''; this.refresh();
   }
   private pauseGlowTimer(): void {
     if (this.glowTimer === null) return;

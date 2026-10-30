@@ -35,6 +35,12 @@ export class DetectionOverlays {
     this.tick();
     this.timer = setInterval(() => this.tick(), 80);
   }
+  setLabels(labels: { stream: string; chat: string }): void {
+    for (const [index, label] of [labels.stream, labels.chat].entries()) {
+      const detector = this.detectors[index];
+      if (detector && detector.motion.label !== label) { detector.motion = new DetectionMotion(label, detector.motion.baseline, index * 1600); this.apply(detector, { label, confidence: detector.motion.baseline }); }
+    }
+  }
   private stop(): void {
     if (this.timer !== null) clearInterval(this.timer);
     this.timer = null;

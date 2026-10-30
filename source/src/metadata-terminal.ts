@@ -9,8 +9,8 @@ export function metadataLines(state: HostState, now = new Date()): string[] {
   return [
     `[resolution] ${state.config.canvas.width}*${state.config.canvas.height}`,
     `[frame-rate] ${Math.round(state.audio.frameRate || 60)}fps`,
-    '[target-bitrate] 5000kbps', '[liveroom-id] 526038',
-    '[sponsor] HOPE FINDERS', '[sponsor] BASS KARYOTES',
+    '[target-bitrate] ' + state.config.metadata.targetBitrate, '[liveroom-id] ' + state.config.metadata.roomId,
+    ...state.config.metadata.sponsors.map(sponsor => '[sponsor] ' + sponsor),
     `[date] ${date}`, `[time] ${now.toLocaleTimeString('en-GB', { hour12: false })}`,
     '[capture] WASAPI LOOPBACK',
     state.audio.state === 'live' ? `[audio] ${state.audio.sampleRate / 1000}kHz / ${state.audio.channels}CH` : `[audio] ${state.audio.state.toUpperCase()}`,

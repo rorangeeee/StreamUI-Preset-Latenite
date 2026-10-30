@@ -1,0 +1,39 @@
+{
+  "obsSceneName": "",
+  "titles": {
+    "english": [
+      "RANDOM PLAY"
+    ],
+    "chinese": [
+      "随便播播"
+    ]
+  },
+  "brandWords": [
+    "LATENITE",
+    "NOIZBOIZ",
+    "HOPEFINDERS",
+    "BASSKARYOTES"
+  ],
+  "marquees": {
+    "primary": [
+      "CAUTION: WHEN STREAMING",
+      "EXCLUSIVE CONTENT COMING SOON...OR NOW"
+    ],
+    "secondary": [
+      "LIVE STREAM EVERY NIGHT IF POSSIBLE",
+      "GREAT THANKS FOR YOUR WATCHING"
+    ]
+  },
+  "metadata": {
+    "roomId": "526038",
+    "targetBitrate": "5000kbps",
+    "sponsors": [
+      "HOPE FINDERS",
+      "BASS KARYOTES"
+    ]
+  },
+  "labels": {
+    "stream": "STREAMING",
+    "chat": "CHAT"
+  }
+}
