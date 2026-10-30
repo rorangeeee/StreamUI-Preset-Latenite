@@ -7,7 +7,7 @@ import type { ObsSceneEvent } from './obs-bindings.ts';
 const sdkUrl = '/sdk/streamui.js';
 const { createClient, getSceneContext, request } = await import(/* @vite-ignore */ sdkUrl) as CoreSdk;
 
-export interface AwaySettings { enabled: boolean; text1: string; text2: string; overlayOpacity: number }
+export interface AwaySettings { enabled: boolean; text1: string; text2: string; texts?: string[]; overlayOpacity: number }
 export interface SceneParameters {
   obsSceneName: string;
   titles: { english: string[]; chinese: string[] };

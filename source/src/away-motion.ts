@@ -10,8 +10,8 @@ export interface AwayFrame extends Geometry { mask: number; phase: AwayPhase }
 const HIDDEN: Geometry = { width: 0, expand: 0, offset: 0, text: 0 };
 const VISIBLE: Geometry = { width: 1, expand: 1, offset: 0, text: 1 };
 
-export function awayMessages(settings: { text1: string; text2: string }): string[] {
-  return [settings.text1.trim(), settings.text2.trim()].filter(Boolean);
+export function awayMessages(settings: { texts?: readonly string[]; text1?: string; text2?: string }): string[] {
+  return (settings.texts ?? [settings.text1 ?? '', settings.text2 ?? '']).map(text => text.trim()).filter(Boolean);
 }
 
 /** Every reversal starts at the current geometry, including a partly drawn line. */
