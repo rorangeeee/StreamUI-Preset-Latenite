@@ -56,11 +56,7 @@ now-playing text { font-weight: 400; white-space: pre; font-optical-sizing: none
 .themebar-window[data-inverted="true"] .themebar-art { filter: invert(1); }
 on-air-indicator { position: absolute; left: .4%; top: -5.79%; width: 9.268%; height: 38.006%; pointer-events: none; }
 on-air-indicator:not([data-fonts]) { visibility: hidden; }
-on-air-indicator svg { display: block; width: 100%; height: 100%; overflow: visible; }
-on-air-indicator text { font-family: 'StreamUI SF Pro', sans-serif; font-size: 25px; font-optical-sizing: none; font-synthesis: none; }
-.record-light { fill: currentColor; color: #8a1024; }
-.record-letter { font-weight: 1000; font-variation-settings: 'wght' 1000, 'wdth' 100, 'opsz' 28; }
-.on-air-label { fill: #000; font-weight: 200; font-variation-settings: 'wdth' 100, 'opsz' 28; }
+on-air-indicator canvas { display: block; width: 100%; height: 100%; }
 .themebar-window[data-inverted="true"] on-air-indicator { filter: invert(1); }
 barcode-code { position: absolute; left: 2.60285%; top: 75.715%; width: 7.4595%; height: 10.1347%; display: block; color: #000; pointer-events: none; }
 barcode-code svg { display: block; width: 100%; height: 100%; }

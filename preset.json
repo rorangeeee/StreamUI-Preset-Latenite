@@ -3,7 +3,7 @@
   "sdkVersion": 2,
   "id": "latenite",
   "name": "LATENITE 多场景",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "3840 × 2160 双布局，保留弹幕、字标、音频可视化、暂离条带与像素转场。",
   "defaultScene": "ultrawide",
   "defaults": "defaults.json",
@@ -46,10 +46,10 @@
   "plugins": [
     {
       "id": "desktop-audio",
-      "minimumVersion": "1.0.2",
+      "minimumVersion": "1.0.3",
       "required": true,
       "repository": "https://github.com/rorangeeee/StreamUI-Plugin-DesktopAudio.git",
-      "ref": "3bedd09b691ad449a6f1489f7531992c6f34ccbb"
+      "ref": "1ec6be992498d002d4cfcb40ae128c157dcfc756"
     },
     {
       "id": "system-media",
@@ -60,17 +60,17 @@
     },
     {
       "id": "obs-scenes",
-      "minimumVersion": "1.0.0",
+      "minimumVersion": "1.0.1",
       "required": true,
       "repository": "https://github.com/rorangeeee/StreamUI-Plugin-ObsScenes.git",
-      "ref": "ffb4eb32ad6c04ef78521762a30a4d9a854155ac"
+      "ref": "be05ece25af42bc9f58d4511bcbb6a20b1392f44"
     },
     {
       "id": "laplace",
-      "minimumVersion": "1.0.0",
+      "minimumVersion": "1.0.1",
       "required": true,
       "repository": "https://github.com/rorangeeee/StreamUI-Plugin-Laplace.git",
-      "ref": "c40b913ed910ee7552a6c9f951e3659d40438c1e"
+      "ref": "b6be5fa5c2009fb2282ec0666f1555fa746a3b70"
     }
   ],
   "repository": "https://github.com/rorangeeee/StreamUI-Preset-Latenite",
