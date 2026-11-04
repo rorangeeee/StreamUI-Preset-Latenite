@@ -3,10 +3,13 @@
   "sdkVersion": 2,
   "id": "latenite",
   "name": "LATENITE 多场景",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "3840 × 2160 双布局，保留弹幕、字标、音频可视化、暂离条带与像素转场。",
   "defaultScene": "ultrawide",
   "defaults": "defaults.json",
+  "trayControls": [
+    { "label": "暂离模式", "setting": "controls.away" }
+  ],
   "scenes": [
     {
       "id": "ultrawide",
