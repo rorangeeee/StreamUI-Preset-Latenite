@@ -1,4 +1,5 @@
-import { hexRgb, inverseRgb, mixRgb, sampleWordmark, TITLE_MIN_SPACING, TITLE_STEP, TITLE_TIMING, WORDMARKS, WORDMARK_STEP } from './wordmark-motion.ts';
+import { hexRgb, inverseRgb, mixRgb, sampleTitleExtension, sampleWordmark, TITLE_MIN_SPACING, TITLE_STEP, WORDMARKS, WORDMARK_STEP } from './wordmark-motion.ts';
+import { TitleInkFilter } from './title-ink-filter.ts';
 import { titleAtStep } from './title-sequence.ts';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -8,7 +9,7 @@ const CAP_HEIGHT = 112;
 const REST_WIDTH = 900;
 
 interface GlyphLayer { group: SVGGElement; text: SVGTextElement; prefix: string; anchorX: number }
-interface WordLayer { group: SVGGElement; glyphs: GlyphLayer[]; spacingAnchorX: number }
+interface WordLayer { group: SVGGElement; glyphs: GlyphLayer[]; spacingAnchorX: number; fontSize: number }
 
 /** The brand and centered bilingual titles share the original playback clock and motion curve. */
 export class KineticWordmark extends HTMLElement {
@@ -30,6 +31,7 @@ export class KineticWordmark extends HTMLElement {
   private defs!: SVGDefsElement;
   private blurLayer: SVGGElement | null = null;
   private blurEffect: SVGFEGaussianBlurElement | null = null;
+  private inkFilter: TitleInkFilter | null = null;
   private filter: SVGFilterElement | null = null;
   private filterWidth = 2000;
   private filterHeight = 220;
@@ -108,7 +110,7 @@ export class KineticWordmark extends HTMLElement {
   }
   private build(): void {
     this.activeLayer = null; this.renderSignature = '';
-    this.blurLayer = null; this.blurEffect = null; this.filter = null;
+    this.blurLayer = null; this.blurEffect = null; this.inkFilter = null; this.filter = null;
     this.filterWidth = 2000; this.filterHeight = 220;
     this.svg = document.createElementNS(SVG_NS, 'svg');
     this.svg.setAttribute('viewBox', '0 40 1000 140');
@@ -135,7 +137,7 @@ export class KineticWordmark extends HTMLElement {
         prefix += character;
       }
       this.svg.append(group);
-      return { group, glyphs, spacingAnchorX: CENTER_X };
+      return { group, glyphs, spacingAnchorX: CENTER_X, fontSize: 0 };
     });
     this.replaceChildren(this.svg);
   }
@@ -221,6 +223,7 @@ export class KineticWordmark extends HTMLElement {
       }
       // Both ends contract symmetrically toward the shared center of the title area.
       layer.spacingAnchorX = centerX;
+      layer.fontSize = fontSize * scale;
     });
     this.renderSignature = ''; this.ready = true; this.dataset.fonts = fontStatus; this.syncPlayback();
   }
@@ -237,14 +240,14 @@ export class KineticWordmark extends HTMLElement {
     if (this.ready) this.render(this.reducedMotion.matches ? 0 : KineticWordmark.elapsed);
     if (this.titleMode && this.isConnected) void this.loadFonts();
   }
-  private renderBlur(active: WordLayer, blurX: number): void {
+  private renderBlur(active: WordLayer, blurX: number, extension = 0): void {
     if (blurX <= 0) {
       if (!this.blurLayer) return;
       // Release the temporary filtered surface so the rotated wordmark rests
       // on a fresh, unfiltered surface without cached highlight edges.
       this.svg.append(active.group);
       this.blurLayer.remove(); this.filter?.remove();
-      this.blurLayer = null; this.blurEffect = null; this.filter = null;
+      this.blurLayer = null; this.blurEffect = null; this.inkFilter = null; this.filter = null;
       return;
     }
     if (!this.blurLayer) {
@@ -254,19 +257,28 @@ export class KineticWordmark extends HTMLElement {
       this.filter.setAttribute('x', '-500'); this.filter.setAttribute('y', '0');
       this.filter.setAttribute('width', String(this.filterWidth)); this.filter.setAttribute('height', String(this.filterHeight));
       this.filter.setAttribute('color-interpolation-filters', 'sRGB');
-      this.blurEffect = document.createElementNS(SVG_NS, 'feGaussianBlur');
-      this.blurEffect.setAttribute('in', 'SourceGraphic');
-      this.blurEffect.setAttribute('edgeMode', 'none');
-      this.filter.append(this.blurEffect); this.defs.append(this.filter);
+      if (this.titleMode) this.inkFilter = new TitleInkFilter(this.filter);
+      else {
+        this.blurEffect = document.createElementNS(SVG_NS, 'feGaussianBlur');
+        this.blurEffect.setAttribute('in', 'SourceGraphic');
+        this.blurEffect.setAttribute('edgeMode', 'none');
+        this.filter.append(this.blurEffect);
+      }
+      this.defs.append(this.filter);
       this.blurLayer = document.createElementNS(SVG_NS, 'g');
       this.blurLayer.setAttribute('filter', `url(#${this.filter.id})`);
       this.svg.append(this.blurLayer);
     }
-    this.blurEffect!.setAttribute('stdDeviation', `${blurX} 0`);
+    if (this.inkFilter) {
+      const matrix = this.svg.getScreenCTM();
+      const pixelScale = matrix ? Math.hypot(matrix.a, matrix.b) * devicePixelRatio : 1;
+      this.inkFilter.update(extension, blurX, pixelScale);
+    } else this.blurEffect!.setAttribute('stdDeviation', `${blurX} 0`);
     if (active.group.parentNode !== this.blurLayer) this.blurLayer.append(active.group);
   }
   private render(time: number): void {
-    const state = sampleWordmark(time, this.phrases.length, this.blurOnly ? TITLE_MIN_SPACING : undefined, this.titleMode ? TITLE_TIMING : undefined);
+    const state = this.titleMode ? sampleTitleExtension(time, this.phrases.length)
+      : sampleWordmark(time, this.phrases.length, this.blurOnly ? TITLE_MIN_SPACING : undefined);
     const step = Math.floor(Math.max(0, time) / (this.titleMode ? TITLE_STEP : WORDMARK_STEP)) + (state.phase === 'shrink' ? 1 : 0);
     const title = this.bilingual ? titleAtStep(step, this.bilingual.englishCount, this.bilingual.chineseCount) : null;
     const index = title?.layerIndex ?? (state.phase === 'shrink' ? state.to : state.from);
@@ -287,8 +299,10 @@ export class KineticWordmark extends HTMLElement {
       active.group.removeAttribute('display');
       active.group.setAttribute('visibility', 'visible'); this.activeLayer = active;
     }
-    this.renderBlur(active, state.blurX);
-    const scaleX = this.blurOnly ? 1 : state.glyphScaleX;
+    // Keep the lab effect proportional to the fitted title on resized canvases.
+    const extension = this.titleMode ? active.fontSize * 1.15 * (1 - Math.abs(2 * state.progress - 1)) : 0;
+    this.renderBlur(active, this.titleMode ? state.blurX * active.fontSize / (active.group.dataset.language === 'zh' ? 72 : 118) : state.blurX, extension);
+    const scaleX = this.titleMode || this.blurOnly ? 1 : state.glyphScaleX;
     for (const glyph of active.glyphs) {
       const anchorX = active.spacingAnchorX + (glyph.anchorX - active.spacingAnchorX) * state.spacingScale;
       glyph.group.setAttribute('transform', `translate(${anchorX} 0) scale(${scaleX} 1) translate(${-glyph.anchorX} 0)`);

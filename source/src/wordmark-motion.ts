@@ -62,3 +62,11 @@ export function inverseRgb(color: readonly number[]): [number, number, number] {
 export function mixRgb(from: readonly number[], to: readonly number[], progress: number): string {
   return `rgb(${from.map((channel, index) => Math.round(channel + (to[index] - channel) * progress)).join(', ')})`;
 }
+
+/** Lab ink-growth transition, using the existing scene-title dwell time. */
+export function sampleTitleExtension(time: number, wordCount: number) {
+  const state = sampleWordmark(time, wordCount, .75, TITLE_TIMING);
+  const amount = 1 - Math.abs(2 * state.progress - 1);
+  return { ...state, glyphScaleX: 1, blurX: 64 * amount,
+    light: Math.max(0, Math.min(1, (amount - .82) / .18)) };
+}
