@@ -158,6 +158,26 @@ export class KineticWordmark extends HTMLElement {
     if (loaded.some(result => result.status === 'rejected')) fontStatus = 'fallback';
     if (!this.isConnected || generation !== this.generation) return;
     const context = document.createElement('canvas').getContext('2d')!;
+    // Font-size does not describe the visible height of a pixel font. Match
+    // Chinese to the loaded English face's cap height, including its baseline.
+    let englishCapCenter = 0, chineseCapCenter = 0;
+    if (this.bilingual) {
+      const english = fonts[0];
+      context.font = `400 ${english.size}px ${english.family}`;
+      const cap = context.measureText('H');
+      const capHeight = cap.actualBoundingBoxAscent + cap.actualBoundingBoxDescent;
+      englishCapCenter = (cap.actualBoundingBoxAscent - cap.actualBoundingBoxDescent) / 2;
+      fonts.forEach((font, index) => {
+        if (index < this.bilingual!.englishCount) return;
+        context.font = `400 ${font.size}px ${font.family}`;
+        const reference = context.measureText('国');
+        const ratio = capHeight / (reference.actualBoundingBoxAscent + reference.actualBoundingBoxDescent);
+        font.size *= ratio; font.spacing *= ratio;
+        context.font = `400 ${font.size}px ${font.family}`;
+        const matched = context.measureText('国');
+        chineseCapCenter = (matched.actualBoundingBoxAscent - matched.actualBoundingBoxDescent) / 2;
+      });
+    }
     const measurements = this.phrases.map((word, index) => {
       const font = fonts[index];
       context.font = `400 ${font.size}px ${font.family}`;
@@ -188,7 +208,9 @@ export class KineticWordmark extends HTMLElement {
       const scale = this.titleMode ? titleScale : capHeight / height;
       const centerX = this.titleMode ? titleCenterX : CENTER_X;
       const x = centerX + (metrics.actualBoundingBoxLeft - metrics.actualBoundingBoxRight - Math.max(0, [...this.phrases[index]].length - 1) * spacing) * scale / 2;
-      const y = this.titleMode ? titleBaseline : CENTER_Y + (metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) * scale / 2;
+      const chinese = this.bilingual && index >= this.bilingual.englishCount;
+      const y = this.titleMode ? titleBaseline + (chinese ? (chineseCapCenter - englishCapCenter) * scale : 0)
+        : CENTER_Y + (metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) * scale / 2;
       context.font = `400 ${fontSize * scale}px ${family}`;
       for (const glyph of layer.glyphs) {
         const glyphX = x + context.measureText(glyph.prefix).width + [...glyph.prefix].length * spacing * scale;

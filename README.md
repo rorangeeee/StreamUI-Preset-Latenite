@@ -46,7 +46,7 @@ preset.json 的 trayControls 同时将 controls.away 声明为托盘右键菜单
 
 ## 字体与更新
 
-直播标题、播放曲目标题及暂离条带的中文使用核心像素体（Hexin Pixel Font，0.1.r60），WOFF2 与完整 OFL 1.1 许可随 source/public/fonts/hexin-pixel/ 分发，无需在系统中安装。直播中文标题使用 96px 基准字号，三处中文均按一个源像素（0.125em）增加字距；曲目和暂离保留按实际可见字高校准、居中及长文本适配。字体保持作者原文件，来源与校验值见字体目录 README。
+直播标题、播放曲目标题及暂离条带的中文使用核心像素体（Hexin Pixel Font，0.1.r60），WOFF2 与完整 OFL 1.1 许可随 source/public/fonts/hexin-pixel/ 分发，无需在系统中安装。直播中文标题按实际加载英文字体的 H 字高匹配“国”的可见字高，并对齐字形中心；字号和字距一起缩放，避免本机英文字体差异造成中文偏高。三处中文均按一个源像素（0.125em）增加字距；曲目和暂离保留按实际可见字高校准、居中及长文本适配。字体保持作者原文件，来源与校验值见字体目录 README。
 
 英文及其他装饰仍使用本机 Retro Pixel、Blue Screen Personal Use、JetBrains Mono 等字体，这些本机字体不在仓库中分发。透明输出根页面使用 color-scheme:normal。
 
