@@ -129,6 +129,7 @@ export class AwayOverlay extends HTMLElement {
         const face = faces[run.language];
         const node = svgElement('text', { class: 'away-message', x, y: bandHeight / 2 + (face.ascent - face.descent) / 2, 'font-size': face.size });
         node.style.fontFamily = PIXEL_FONT_FAMILIES[run.language]; node.dataset.language = run.language;
+        if (run.language === 'zh') node.style.letterSpacing = face.size / 8 + 'px';
         node.textContent = run.text; group.append(node); unit.append(group);
         x += node.getComputedTextLength();
       }

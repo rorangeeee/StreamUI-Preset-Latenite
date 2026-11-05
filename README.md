@@ -46,7 +46,9 @@ preset.json 的 trayControls 同时将 controls.away 声明为托盘右键菜单
 
 ## 字体与更新
 
-原外观使用本机 Retro Pixel、405 SS、Blue Screen Personal Use、JetBrains Mono 等字体，字体不在仓库中分发。透明输出根页面使用 color-scheme:normal。
+直播标题、播放曲目标题及暂离条带的中文使用核心像素体（Hexin Pixel Font，0.1.r60），WOFF2 与完整 OFL 1.1 许可随 source/public/fonts/hexin-pixel/ 分发，无需在系统中安装。直播中文标题使用 96px 基准字号，三处中文均按一个源像素（0.125em）增加字距；曲目和暂离保留按实际可见字高校准、居中及长文本适配。字体保持作者原文件，来源与校验值见字体目录 README。
+
+英文及其他装饰仍使用本机 Retro Pixel、Blue Screen Personal Use、JetBrains Mono 等字体，这些本机字体不在仓库中分发。透明输出根页面使用 color-scheme:normal。
 
 ON AIR 使用固定字重的字形缓存，在 Canvas 中混合字重、伸缩和倾斜，保留原来的播放时钟与录制闪烁。避免在 OBS 33 的 Chromium 150 中逐帧修改 SF Pro 可变字体轴引起的 SVG 排版阻塞。OBS 33.0.1 的 3840 × 2160 / 120 Hz 独立测试中，10 秒采样由约 10.4 FPS 恢复至约 119.9 FPS，修复后没有超过 33 ms 的帧。
 

@@ -145,7 +145,8 @@ export class KineticWordmark extends HTMLElement {
     this.fontSignature = `${style.fontFamily}|${style.fontSize}|${this.clientWidth}|${this.clientHeight}`;
     const fonts = this.layers.map(layer => {
       const textStyle = this.bilingual ? getComputedStyle(layer.group) : style;
-      return { family: textStyle.fontFamily, size: this.titleMode ? parseFloat(textStyle.fontSize) : 160 };
+      return { family: textStyle.fontFamily, size: this.titleMode ? parseFloat(textStyle.fontSize) : 160,
+        spacing: parseFloat(textStyle.letterSpacing) || 0 };
     });
     let fontStatus = 'ready';
     const requests = new Map<string, string>();
@@ -161,7 +162,8 @@ export class KineticWordmark extends HTMLElement {
       const font = fonts[index];
       context.font = `400 ${font.size}px ${font.family}`;
       const metrics = context.measureText(word);
-      return { metrics, width: metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight, height: metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent || font.size * .7 };
+      return { metrics, width: metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight + Math.max(0, [...word].length - 1) * font.spacing,
+        height: metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent || font.size * .7 };
     });
     const capHeight = Math.min(CAP_HEIGHT, REST_WIDTH / Math.max(...measurements.map(item => item.width / item.height)));
     const titleWidth = this.clientWidth || 2265.558;
@@ -181,15 +183,15 @@ export class KineticWordmark extends HTMLElement {
       this.filter?.setAttribute('height', String(this.filterHeight));
     }
     this.layers.forEach((layer, index) => {
-      const { family, size: fontSize } = fonts[index];
+      const { family, size: fontSize, spacing } = fonts[index];
       const { metrics, height } = measurements[index];
       const scale = this.titleMode ? titleScale : capHeight / height;
       const centerX = this.titleMode ? titleCenterX : CENTER_X;
-      const x = centerX + (metrics.actualBoundingBoxLeft - metrics.actualBoundingBoxRight) * scale / 2;
+      const x = centerX + (metrics.actualBoundingBoxLeft - metrics.actualBoundingBoxRight - Math.max(0, [...this.phrases[index]].length - 1) * spacing) * scale / 2;
       const y = this.titleMode ? titleBaseline : CENTER_Y + (metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) * scale / 2;
       context.font = `400 ${fontSize * scale}px ${family}`;
       for (const glyph of layer.glyphs) {
-        const glyphX = x + context.measureText(glyph.prefix).width;
+        const glyphX = x + context.measureText(glyph.prefix).width + [...glyph.prefix].length * spacing * scale;
         const glyphMetrics = context.measureText(glyph.text.textContent!);
         glyph.anchorX = glyphX + (glyphMetrics.actualBoundingBoxRight - glyphMetrics.actualBoundingBoxLeft) / 2;
         glyph.text.setAttribute('font-size', String(fontSize * scale));

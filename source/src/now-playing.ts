@@ -147,6 +147,7 @@ export class NowPlaying extends HTMLElement {
       node.textContent = run.text; node.style.fontFamily = FAMILIES[run.language];
       const face = faces[run.language];
       node.setAttribute('font-size', String(face.size));
+      if (run.language === 'zh') node.style.letterSpacing = face.size / 8 + 'px';
       node.setAttribute('y', String(-face.y - face.height / 2));
       return node;
     });
