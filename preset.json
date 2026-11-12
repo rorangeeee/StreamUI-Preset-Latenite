@@ -74,6 +74,13 @@
       "required": true,
       "repository": "https://github.com/rorangeeee/StreamUI-Plugin-Laplace.git",
       "ref": "b6be5fa5c2009fb2282ec0666f1555fa746a3b70"
+    },
+    {
+      "id": "desktop-input",
+      "minimumVersion": "1.0.0",
+      "required": false,
+      "repository": "https://github.com/rorangeeee/StreamUI-Plugin-DesktopInput.git",
+      "ref": "df39a2b102ba5e61e14b5eac68da3a2f92b094cd"
     }
   ],
   "repository": "https://github.com/rorangeeee/StreamUI-Preset-Latenite",
