@@ -5,7 +5,8 @@ const [values, state] = await Promise.all([settings.read(), request('/api/state'
 const scene = state.scenes.find(scene => scene.id === context.sceneId);
 const form = document.querySelector('form'), status = document.querySelector('output');
 const labels = { pending: '等待保存…', saving: '正在保存…', saved: '已保存', error: '保存失败' };
-const save = createAutoSave(patch => settings.patch(patch), { onStatus: value => status.textContent = labels[value], onError: error => status.textContent = error.message });
+const saveStatus = { onStatus: value => status.textContent = labels[value], onError: error => status.textContent = error.message };
+const save = createAutoSave(patch => settings.patch(patch), saveStatus);
 const read = key => key === 'texts'
   ? values.texts ?? [values.text1, values.text2].filter(text => typeof text === 'string' && text.trim())
   : key.split('.').reduce((value, part) => value?.[part], values);
@@ -41,3 +42,65 @@ for (const section of fieldsFor(scene.view)) {
 }
 form.onsubmit = event => event.preventDefault();
 addEventListener('pagehide', () => void save.flush().catch(() => {}));
+
+if (scene.view === '21:9' || scene.view === '16:9') {
+  const preset = client.settings('preset', scene.presetId);
+  const section = document.querySelector('#input-settings').content.firstElementChild.cloneNode(true);
+  const controls = [...section.querySelectorAll('input, select')];
+  const [keyboard, layout, mouse, motion] = controls;
+  const hint = section.querySelector('.input-settings-hint');
+  let plugin = state.plugins.find(item => item.id === 'desktop-input');
+  let pending = false, revision = 0;
+
+  function updateOptions() {
+    layout.disabled = !keyboard.checked;
+    motion.disabled = !mouse.checked;
+    let message = '';
+    if (keyboard.checked || mouse.checked) {
+      if (!plugin) message = '需要安装「键盘与鼠标输入」插件。';
+      else if (plugin.state === 'error') message = `无法启动键盘与鼠标输入（${plugin.error ?? '请在插件设置中重新启用'}）。`;
+      else if (!plugin.enabled) message = '在「插件设置」中启用「键盘与鼠标输入」即可显示实时按键。';
+    }
+    hint.textContent = message;
+    hint.hidden = !message;
+  }
+
+  async function refresh() {
+    const requested = ++revision;
+    try {
+      const { inputDisplay } = await preset.read();
+      if (pending || requested !== revision) return;
+      keyboard.checked = inputDisplay?.keyboard === true;
+      mouse.checked = inputDisplay?.mouse === true;
+      motion.checked = inputDisplay?.mouseMotion !== false;
+      layout.value = inputDisplay?.keyboardLayout ?? 'wasd';
+      if (!layout.value) layout.value = 'wasd';
+      updateOptions();
+    } catch (error) { saveStatus.onError(error); }
+  }
+
+  const saveInput = createAutoSave(change => preset.patch(change), {
+    ...saveStatus,
+    onStatus(value) {
+      pending = value === 'pending' || value === 'saving';
+      saveStatus.onStatus(value);
+      if (value === 'saved') void refresh();
+    },
+  });
+  for (const control of controls) control.addEventListener('change', () => {
+    const value = control.type === 'checkbox' ? control.checked : control.value;
+    saveInput.update({ inputDisplay: { [control.name]: value } }, true);
+    updateOptions();
+  });
+
+  client.onState(value => {
+    plugin = value.plugins.find(item => item.id === 'desktop-input');
+    updateOptions();
+  });
+  client.on('preset.settingsChanged', ({ id }) => { if (id === scene.presetId && !pending) void refresh(); });
+  addEventListener('pagehide', () => { void saveInput.flush().catch(() => {}); client.stop(); });
+  addEventListener('pageshow', () => { client.start(); void refresh(); });
+  await refresh();
+  form.append(section);
+  client.start();
+}

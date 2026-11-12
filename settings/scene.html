@@ -1,1 +1,34 @@
-<!doctype html><html lang="zh-CN"><meta charset="utf-8"><script src="/config-appearance.js"></script><link rel="stylesheet" href="/config-theme.css"><link rel="stylesheet" href="../panel.css"><form></form><output role="status">更改后自动保存</output><script type="module" src="./scene.js"></script></html>
+<!doctype html>
+<html lang="zh-CN">
+  <meta charset="utf-8">
+  <script src="/config-appearance.js"></script>
+  <link rel="stylesheet" href="/config-theme.css">
+  <link rel="stylesheet" href="../panel.css">
+  <form></form>
+  <output role="status">更改后自动保存</output>
+  <template id="input-settings">
+    <section class="input-settings" aria-labelledby="input-settings-title">
+      <h2 id="input-settings-title">键鼠显示</h2>
+      <div class="input-options">
+        <label class="input-switch">显示键盘<input name="keyboard" type="checkbox" role="switch"></label>
+        <label>键盘布局
+          <select name="keyboardLayout">
+            <option value="wasd">WASD</option>
+            <option value="arrows">方向键 + Shift / Ctrl</option>
+            <option value="left">键盘左半区</option>
+            <option value="60">60 配列</option>
+            <option value="75">75 配列</option>
+            <option value="98">98 配列</option>
+            <option value="108">108 配列</option>
+          </select>
+        </label>
+      </div>
+      <div class="input-options">
+        <label class="input-switch">显示鼠标<input name="mouse" type="checkbox" role="switch"></label>
+        <label class="input-switch">显示鼠标移动<input name="mouseMotion" type="checkbox" role="switch"></label>
+      </div>
+      <p class="input-settings-hint" role="status" hidden></p>
+    </section>
+  </template>
+  <script type="module" src="./scene.js"></script>
+</html>

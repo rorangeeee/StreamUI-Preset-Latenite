@@ -7,6 +7,8 @@ export class StagePresentation {
   private mode: StageMode | null = null;
   private title: HTMLElement;
   private brand: HTMLElement;
+  private stream: HTMLElement;
+  private input: HTMLElement;
   private decorations: HTMLDivElement;
   private nowPlaying: HTMLElement | null;
   private nowPlayingParent: HTMLElement | null;
@@ -16,6 +18,8 @@ export class StagePresentation {
   constructor(private workspace: HTMLElement) {
     this.title = workspace.querySelector('#wordmark-blur-window')!;
     this.brand = workspace.querySelector('#wordmark-window')!;
+    this.stream = workspace.querySelector('#stream-window')!;
+    this.input = this.stream.querySelector('#input-display')!;
     this.decorations = document.createElement('div');
     this.decorations.className = 'themebar-decorations';
     for (const child of [...this.title.children]) if (!child.matches('kinetic-wordmark')) this.decorations.append(child);
@@ -41,6 +45,7 @@ export class StagePresentation {
     this.brand.querySelector('kinetic-wordmark')!.setAttribute('effect', mode === '16:9' ? 'stretch' : 'blur');
     this.chatHistory.setActive(mode === '16:9');
     (mode === '16:9' ? this.brand : this.title).prepend(this.decorations);
+    (mode === '16:9' ? this.workspace : this.stream).append(this.input);
     if (this.nowPlaying) {
       (mode === '16:9' ? this.workspace : this.nowPlayingParent)?.append(this.nowPlaying);
       this.nowPlaying.classList.toggle('wide-now-playing', mode === '16:9');

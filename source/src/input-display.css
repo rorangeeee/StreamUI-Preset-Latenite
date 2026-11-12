@@ -1,0 +1,111 @@
+.input-display {
+  --input-height: calc(278px * var(--ui-scale));
+  --input-line: calc(2.2px * var(--ui-scale));
+  --key-gap: calc(5px * var(--ui-scale));
+  position: absolute;
+  left: calc(90px * var(--ui-scale));
+  bottom: calc(18px * var(--ui-scale));
+  z-index: 3;
+  display: flex;
+  align-items: end;
+  gap: calc(22px * var(--ui-scale));
+  height: var(--input-height);
+  color: #fff;
+  font: 400 calc(15px * var(--ui-scale))/1 'JetBrains Mono', 'Segoe UI Symbol', monospace;
+  pointer-events: none;
+  user-select: none;
+}
+#workspace[data-layout-mode="16:9"] > .input-display {
+  left: calc(244px * var(--ui-scale));
+  bottom: calc(148px * var(--ui-scale));
+  z-index: 12;
+}
+.input-display[hidden], .input-display [hidden] { display: none; }
+.input-cell {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  border: var(--input-line) solid rgb(255 255 255 / .83);
+  background: rgb(0 0 0 / .67);
+}
+.input-cell.is-pressed {
+  border-color: var(--accent-inverse);
+  background: var(--accent-inverse);
+  color: #161b0c;
+}
+.input-keyboard { position: relative; flex: none; }
+.input-keyboard.is-compact { font-size: calc(25px * var(--ui-scale)); }
+.input-key { position: absolute; white-space: nowrap; }
+.input-mouse {
+  display: grid;
+  flex: none;
+  grid-template-columns: calc(29px * var(--ui-scale)) minmax(0, 1fr);
+  gap: var(--key-gap);
+  width: calc(196px * var(--ui-scale));
+  height: var(--input-height);
+  font-size: calc(20px * var(--ui-scale));
+}
+.input-mouse-side {
+  display: grid;
+  grid-auto-rows: calc(45px * var(--ui-scale));
+  align-content: start;
+  gap: var(--key-gap);
+  padding-top: calc(91px * var(--ui-scale));
+  font-size: calc(15px * var(--ui-scale));
+}
+.input-mouse-body {
+  display: grid;
+  grid-template-rows: calc(104px * var(--ui-scale)) minmax(0, 1fr);
+  gap: var(--key-gap);
+}
+.input-mouse-buttons {
+  display: grid;
+  grid-template-columns: 1fr calc(37px * var(--ui-scale)) 1fr;
+  gap: var(--key-gap);
+}
+.input-mouse-wheel { display: grid; grid-template-rows: repeat(3, 1fr); gap: var(--key-gap); }
+.input-wheel-up::after, .input-wheel-down::after {
+  content: '';
+  width: calc(7px * var(--ui-scale));
+  height: calc(7px * var(--ui-scale));
+  border: solid currentColor;
+  border-width: var(--input-line) var(--input-line) 0 0;
+  transform: translateY(15%) rotate(-45deg);
+}
+.input-wheel-down::after { transform: translateY(-15%) rotate(135deg); }
+.input-wheel-press::after {
+  content: '';
+  width: calc(7px * var(--ui-scale));
+  height: calc(7px * var(--ui-scale));
+  background: currentColor;
+}
+.input-mouse-palm { position: relative; }
+.input-mouse-motion { position: absolute; inset: 0; }
+.input-mouse-motion::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(6px * var(--ui-scale));
+  height: calc(6px * var(--ui-scale));
+  border-radius: 50%;
+  background: rgb(255 255 255 / .83);
+  transform: translate(-50%, -50%);
+}
+.input-mouse-arrow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: calc(14px * var(--ui-scale));
+  background: var(--accent-inverse);
+  clip-path: polygon(0 39%, calc(100% - 9px * var(--ui-scale)) 39%, calc(100% - 9px * var(--ui-scale)) 0,
+    100% 50%, calc(100% - 9px * var(--ui-scale)) 100%, calc(100% - 9px * var(--ui-scale)) 61%, 0 61%);
+  transform-origin: left center;
+  opacity: 0;
+  transition: opacity 85ms ease-out;
+}
+.input-mouse-arrow.is-moving { opacity: 1; transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .input-mouse-arrow { transition: none; }
+}

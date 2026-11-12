@@ -33,6 +33,7 @@ export interface ChatMessage {
 export interface CoreClient {
   on<T=unknown>(topic:string,callback:(data:T)=>void):()=>void;
   onState(callback:(state:PublicState)=>void):()=>void;
+  binary(pluginId:string,topic:string,callback:(data:ArrayBuffer)=>void):()=>void;
   start():void; stop():void;
   selectScene(id:string,options?:SceneSelection):Promise<PublicState>;
   settings(scope:'scene'|'plugin'|'preset',id:string):{read<T extends object=Record<string,unknown>>():Promise<T>;save(value:object):Promise<void>;patch(value:object):Promise<void>};

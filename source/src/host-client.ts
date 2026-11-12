@@ -4,7 +4,9 @@ import type { StageMode } from './stage-layout.ts';
 import type { PublicState, ChatMessage, CoreSdk, ScenePlayback } from './core-sdk-types.ts';
 import { ObsSceneBindings } from './obs-bindings.ts';
 import type { ObsSceneEvent } from './obs-bindings.ts';
+import type { InputDisplaySettings } from './input-display.ts';
 const sdkUrl = '/sdk/streamui.js';
+const inputPlugin = 'desktop-input';
 const { createClient, getSceneContext, request } = await import(/* @vite-ignore */ sdkUrl) as CoreSdk;
 
 export interface AwaySettings { enabled: boolean; text1: string; text2: string; texts?: string[]; overlayOpacity: number }
@@ -21,15 +23,17 @@ export interface HostConfig extends SceneParameters {
   canvas: { width: number; height: number }; layout: SavedLayout | null;
   layoutVersion: number; layoutMode: StageMode; layoutProfiles: Partial<Record<StageMode, SavedLayout | null>>;
   away: AwaySettings;
+  inputDisplay: InputDisplaySettings;
 }
 export interface HostState {
   nowPlaying?: NowPlayingTrack; transition: ScenePlayback | null;
+  inputAvailable: boolean;
   config: HostConfig;
   audio: { state: string; error: string | null; deviceId: string | null; sampleRate: number; channels: number; deviceSampleRate: number; frameRate: number };
   laplace: { state: string; error: string | null; localBridge: boolean; events: number; lastEventAt: string | null };
   obsUrl: string; configUrl: string; startup: boolean;
 }
-type VisualSettings = Pick<HostConfig, 'canvas' | 'layoutVersion' | 'layoutProfiles'> & { controls: { away: boolean } };
+type VisualSettings = Pick<HostConfig, 'canvas' | 'layoutVersion' | 'layoutProfiles' | 'inputDisplay'> & { controls: { away: boolean } };
 interface ObsStatus { state: string; scene: string | null; error: string | null }
 export class HostConnection extends EventTarget {
   state: HostState | null = null;
@@ -116,6 +120,7 @@ export class HostConnection extends EventTarget {
         audio: { enabled: core.plugins.some(plugin => plugin.id === 'desktop-audio' && plugin.enabled) },
         away: { text1: '', text2: '', overlayOpacity: .9, ...away, enabled: covered } },
       audio: this.audio, nowPlaying: this.track, transition, laplace: this.chat,
+      inputAvailable: core.plugins.some(plugin => plugin.id === inputPlugin && plugin.state === 'running'),
       obsUrl: core.outputUrl, configUrl: core.configUrl, startup: core.startup,
     };
     this.dispatchEvent(new CustomEvent('state', { detail: this.state }));
@@ -123,6 +128,7 @@ export class HostConnection extends EventTarget {
   start(): void { if (this.active) return; this.active = true; this.client.start(); }
   stop(): void { this.active = false; this.client.stop(); this.connected = false; }
   setOffline(offline: boolean): void { if (offline) this.stop(); }
+  subscribeInput(receive: (data: ArrayBuffer) => void): () => void { return this.client.binary(inputPlugin, 'frames', receive); }
 }
 export const host = new HostConnection();
 export function socketUrl(path: string): string {

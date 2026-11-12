@@ -26,6 +26,7 @@ import { TransitionPlayback } from './transition-playback.ts';
 import { transitionSettings } from './transition-settings.ts';
 import { TRANSITION_DURATION } from './transition-model.ts';
 import { AwayOverlay } from './away-overlay.ts';
+import { InputDisplay } from './input-display.ts';
 
 const editor = new URLSearchParams(location.search).get('edit') === '1';
 document.body.dataset.editing = String(editor);
@@ -38,6 +39,7 @@ const presentation = new StagePresentation(workspace);
 const windows = new WindowManager(workspace, editor);
 const nowPlaying = document.querySelector<NowPlaying>('now-playing')!;
 const detections = new DetectionOverlays(workspace);
+const inputDisplay = new InputDisplay(workspace.querySelector('#input-display')!, receive => host.subscribeInput(receive));
 const scopes = Array.from(document.querySelectorAll<AudioScope>('audio-scope'));
 let animation = 0;
 let previousTime = 0;
@@ -90,6 +92,7 @@ function applyState(state: HostState): void {
   document.querySelector<KineticWordmark>('.brand-wordmark')!.setWords(config.brandWords);
   for (const marquee of document.querySelectorAll<StreamMarquee>('stream-marquee')) marquee.setTexts(marquee.dataset.band === 'bottom-primary' ? config.marquees.primary : config.marquees.secondary);
   detections.setLabels(config.labels);
+  inputDisplay.configure(config.inputDisplay, state.inputAvailable);
   const layout = JSON.stringify([mode, config.canvas, config.layout]);
   if ((!editor && layout !== previousLayout) || !initialized || changedSize || changedMode) windows.restore(config.layout);
   previousLayout = layout;

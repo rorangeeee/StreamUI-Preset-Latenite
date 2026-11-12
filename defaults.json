@@ -128,5 +128,11 @@
   },
   "controls": {
     "away": false
+  },
+  "inputDisplay": {
+    "keyboard": false,
+    "mouse": false,
+    "keyboardLayout": "wasd",
+    "mouseMotion": true
   }
 }
