@@ -50,37 +50,27 @@
     {
       "id": "desktop-audio",
       "minimumVersion": "1.0.3",
-      "required": true,
-      "repository": "https://github.com/rorangeeee/StreamUI-Plugin-DesktopAudio.git",
-      "ref": "1ec6be992498d002d4cfcb40ae128c157dcfc756"
+      "required": true
     },
     {
       "id": "system-media",
       "minimumVersion": "1.0.2",
-      "required": true,
-      "repository": "https://github.com/rorangeeee/StreamUI-Plugin-SystemMedia.git",
-      "ref": "81a90f5b355838e30f45ac43d5437d5adf846952"
+      "required": true
     },
     {
       "id": "obs-scenes",
       "minimumVersion": "1.0.1",
-      "required": true,
-      "repository": "https://github.com/rorangeeee/StreamUI-Plugin-ObsScenes.git",
-      "ref": "be05ece25af42bc9f58d4511bcbb6a20b1392f44"
+      "required": true
     },
     {
       "id": "laplace",
       "minimumVersion": "1.0.1",
-      "required": true,
-      "repository": "https://github.com/rorangeeee/StreamUI-Plugin-Laplace.git",
-      "ref": "b6be5fa5c2009fb2282ec0666f1555fa746a3b70"
+      "required": true
     },
     {
       "id": "desktop-input",
       "minimumVersion": "1.0.0",
-      "required": false,
-      "repository": "https://github.com/rorangeeee/StreamUI-Plugin-DesktopInput.git",
-      "ref": "df39a2b102ba5e61e14b5eac68da3a2f92b094cd"
+      "required": false
     }
   ],
   "repository": "https://github.com/rorangeeee/StreamUI-Preset-Latenite",

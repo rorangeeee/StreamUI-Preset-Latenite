@@ -4,6 +4,8 @@ StreamUICore 0.6.1 / 浏览器 SDK 2 的独立预设。3840 × 2160，包含 21:
 
 ## 构建
 
+在 Core 配置页使用「从 Git 安装」，粘贴本预设的仓库地址即可构建预设。Core 会一并安装 `plugins.txt` 列出的桌面音频、系统曲目、OBS 场景联动和 LAPLACE 弹幕插件。
+
 克隆到 Core/presets/latenite：
 
 ~~~powershell

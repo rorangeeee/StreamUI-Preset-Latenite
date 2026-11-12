@@ -1,0 +1,4 @@
+https://github.com/rorangeeee/StreamUI-Plugin-DesktopAudio.git
+https://github.com/rorangeeee/StreamUI-Plugin-SystemMedia.git
+https://github.com/rorangeeee/StreamUI-Plugin-ObsScenes.git
+https://github.com/rorangeeee/StreamUI-Plugin-Laplace.git
