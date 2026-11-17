@@ -28,24 +28,22 @@
         <div id="input-display" class="input-display" aria-hidden="true" hidden>
           <div class="input-keyboard"></div>
           <div class="input-mouse">
-            <div class="input-mouse-side">
-              <span class="input-cell" data-mouse-button="4">2</span>
-              <span class="input-cell" data-mouse-button="3">1</span>
-            </div>
-            <div class="input-mouse-body">
-              <div class="input-mouse-buttons">
-                <span class="input-cell" data-mouse-button="0">L</span>
-                <div class="input-mouse-wheel">
-                  <span class="input-cell input-wheel-up" data-mouse-button="5"></span>
-                  <span class="input-cell input-wheel-press" data-mouse-button="2"></span>
-                  <span class="input-cell input-wheel-down" data-mouse-button="6"></span>
-                </div>
-                <span class="input-cell" data-mouse-button="1">R</span>
-              </div>
-              <div class="input-cell input-mouse-palm">
-                <span class="input-mouse-motion"><span class="input-mouse-arrow"></span></span>
-              </div>
-            </div>
+            <svg class="input-mouse-drawing" viewBox="0 0 240 458" focusable="false">
+              <path class="input-mouse-shell" d="M103 4 Q120 5 137 4 C174 5 207 18 220 41 Q224 47 223 57
+                       C230 69 231 92 229 125 C228 163 223 202 226 237 C227 268 236 300 237 329
+                       C240 397 191 454 120 455 C49 454 0 397 3 329 C4 304 11 280 14 256
+                       V202 L13 192 L11 140 C9 104 10 71 17 57 Q16 47 20 41 C33 18 66 5 103 4 Z" />
+              <path data-mouse-button="0" d="M103 4 C66 5 33 18 20 41 Q16 47 17 57 L26 179
+                       Q27 186 34 187 Q76 192 120 192 V122 H103 Z" />
+              <path data-mouse-button="1" d="M137 4 C174 5 207 18 220 41 Q224 47 223 57 L214 179
+                       Q213 186 206 187 Q164 192 120 192 V122 H137 Z" />
+              <path data-mouse-button="4" d="M11 140 H17 Q21 163 21 192 H13 Z" />
+              <path data-mouse-button="3" d="M14 202 H22 Q24 229 21 256 H14 Z" />
+              <rect data-mouse-button="2" x="103" y="45" width="34" height="77" rx="7" />
+              <path class="input-mouse-scroll" data-mouse-button="5" d="M110 45 H130 Q137 45 137 52 V67 H103 V52 Q103 45 110 45 Z" />
+              <path class="input-mouse-scroll" data-mouse-button="6" d="M103 100 H137 V115 Q137 122 130 122 H110 Q103 122 103 115 Z" />
+            </svg>
+            <span class="input-mouse-motion"><span class="input-mouse-arrow"></span></span>
           </div>
         </div>
       </section>

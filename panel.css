@@ -2,5 +2,8 @@ body{margin:0;font:14px/1.5 "Segoe UI","Microsoft YaHei UI",system-ui,sans-serif
 .input-settings { gap: 14px; }
 .input-options { display: grid; gap: 10px; }
 .input-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.input-opacity { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 3px 12px; }
+.input-opacity-value { color: var(--muted); font-variant-numeric: tabular-nums; }
+.input-opacity input { grid-column: 1 / -1; min-height: 28px; margin: 0; background: transparent; border: 0; }
 .input-settings :disabled { opacity: .5; cursor: default; }
 .input-settings-hint { margin: 0; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }

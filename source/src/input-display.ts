@@ -8,6 +8,7 @@ export interface InputDisplaySettings {
   mouse: boolean;
   keyboardLayout: KeyboardLayout;
   mouseMotion: boolean;
+  opacity: number;
 }
 
 type FrameSubscription = (receive: (data: ArrayBuffer) => void) => () => void;
@@ -17,7 +18,7 @@ const frameTimeout = 750;
 export class InputDisplay {
   private readonly keyboard: HTMLElement;
   private readonly mouse: HTMLElement;
-  private readonly mouseButtons: { element: HTMLElement; bit: number }[];
+  private readonly mouseButtons: { element: SVGElement; bit: number }[];
   private readonly motion: HTMLElement;
   private readonly arrow: HTMLElement;
   private keyCaps: { element: HTMLElement; codes: readonly number[] }[] = [];
@@ -33,7 +34,7 @@ export class InputDisplay {
   constructor(private root: HTMLElement, private subscribe: FrameSubscription) {
     this.keyboard = root.querySelector('.input-keyboard')!;
     this.mouse = root.querySelector('.input-mouse')!;
-    this.mouseButtons = [...this.mouse.querySelectorAll<HTMLElement>('[data-mouse-button]')].map(element => ({
+    this.mouseButtons = [...this.mouse.querySelectorAll<SVGElement>('[data-mouse-button]')].map(element => ({
       element, bit: 1 << Number(element.dataset.mouseButton),
     }));
     this.motion = root.querySelector('.input-mouse-motion')!;
@@ -46,8 +47,10 @@ export class InputDisplay {
   configure(settings: InputDisplaySettings, available: boolean): void {
     const keyboard = settings?.keyboard === true, mouse = settings?.mouse === true;
     const layout = settings?.keyboardLayout;
+    const opacity = settings?.opacity;
     this.available = available;
     this.root.hidden = !keyboard && !mouse;
+    this.root.style.opacity = Number.isFinite(opacity) ? String(opacity) : '';
     this.keyboard.hidden = !keyboard;
     this.mouse.hidden = !mouse;
     this.motion.hidden = settings?.mouseMotion === false;

@@ -88,8 +88,9 @@ export class TransitionRenderer {
     this.grid.replaceChildren(...this.tiles); this.previousTileCount = 0;
     this.clearComponents();
     const selectors = ['#wordmark-blur-window', '#wordmark-window', '#chat-window',
-      ...(target === '21:9' ? ['#spectrogram-window', '#waveform-window', '#stream-window'] : ['now-playing']),
-      'stream-marquee[data-band="bottom-secondary"]', 'stream-marquee[data-band="bottom-primary"]'];
+      ...(target === '21:9' ? ['#spectrogram-window', '#waveform-window', '#stream-window .detection-chrome'] : ['now-playing']),
+      'stream-marquee[data-band="bottom-secondary"]', 'stream-marquee[data-band="bottom-primary"]',
+      '.input-keyboard', '.input-mouse'];
     this.components = selectors.map(selector => this.workspace.querySelector<HTMLElement>(selector)!).filter(Boolean);
     this.fitText();
   }

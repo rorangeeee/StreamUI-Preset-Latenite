@@ -133,6 +133,7 @@
     "keyboard": false,
     "mouse": false,
     "keyboardLayout": "wasd",
-    "mouseMotion": true
+    "mouseMotion": true,
+    "opacity": 1
   }
 }

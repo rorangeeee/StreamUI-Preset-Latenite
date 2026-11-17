@@ -1,6 +1,7 @@
 .input-display {
   --input-height: calc(278px * var(--ui-scale));
   --input-line: calc(2.2px * var(--ui-scale));
+  --input-surface: rgb(0 0 0 / .67);
   --key-gap: calc(5px * var(--ui-scale));
   position: absolute;
   left: calc(90px * var(--ui-scale));
@@ -27,7 +28,7 @@
   min-width: 0;
   min-height: 0;
   border: var(--input-line) solid rgb(255 255 255 / .83);
-  background: rgb(0 0 0 / .67);
+  background: var(--input-surface);
 }
 .input-cell.is-pressed {
   border-color: var(--accent-inverse);
@@ -38,65 +39,37 @@
 .input-keyboard.is-compact { font-size: calc(25px * var(--ui-scale)); }
 .input-key { position: absolute; white-space: nowrap; }
 .input-mouse {
-  display: grid;
+  position: relative;
   flex: none;
-  grid-template-columns: calc(29px * var(--ui-scale)) minmax(0, 1fr);
-  gap: var(--key-gap);
-  width: calc(196px * var(--ui-scale));
   height: var(--input-height);
-  font-size: calc(20px * var(--ui-scale));
+  aspect-ratio: 240 / 458;
 }
-.input-mouse-side {
-  display: grid;
-  grid-auto-rows: calc(45px * var(--ui-scale));
-  align-content: start;
-  gap: var(--key-gap);
-  padding-top: calc(91px * var(--ui-scale));
-  font-size: calc(15px * var(--ui-scale));
+.input-mouse-drawing {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: rgb(255 255 255 / .9);
+  stroke-width: 3.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
-.input-mouse-body {
-  display: grid;
-  grid-template-rows: calc(104px * var(--ui-scale)) minmax(0, 1fr);
-  gap: var(--key-gap);
+.input-mouse-shell { fill: var(--input-surface); }
+.input-mouse-drawing .is-pressed {
+  fill: var(--accent-inverse);
+  stroke: var(--accent-inverse);
 }
-.input-mouse-buttons {
-  display: grid;
-  grid-template-columns: 1fr calc(37px * var(--ui-scale)) 1fr;
-  gap: var(--key-gap);
-}
-.input-mouse-wheel { display: grid; grid-template-rows: repeat(3, 1fr); gap: var(--key-gap); }
-.input-wheel-up::after, .input-wheel-down::after {
-  content: '';
-  width: calc(7px * var(--ui-scale));
-  height: calc(7px * var(--ui-scale));
-  border: solid currentColor;
-  border-width: var(--input-line) var(--input-line) 0 0;
-  transform: translateY(15%) rotate(-45deg);
-}
-.input-wheel-down::after { transform: translateY(-15%) rotate(135deg); }
-.input-wheel-press::after {
-  content: '';
-  width: calc(7px * var(--ui-scale));
-  height: calc(7px * var(--ui-scale));
-  background: currentColor;
-}
-.input-mouse-palm { position: relative; }
-.input-mouse-motion { position: absolute; inset: 0; }
-.input-mouse-motion::before {
-  content: '';
+.input-mouse-scroll { visibility: hidden; }
+.input-mouse-scroll.is-pressed { visibility: visible; stroke: none; }
+.input-mouse-motion {
   position: absolute;
   left: 50%;
-  top: 50%;
-  width: calc(6px * var(--ui-scale));
-  height: calc(6px * var(--ui-scale));
-  border-radius: 50%;
-  background: rgb(255 255 255 / .83);
-  transform: translate(-50%, -50%);
+  top: 70%;
 }
 .input-mouse-arrow {
   position: absolute;
-  left: 50%;
-  top: 50%;
+  left: 0;
+  top: 0;
   height: calc(14px * var(--ui-scale));
   background: var(--accent-inverse);
   clip-path: polygon(0 39%, calc(100% - 9px * var(--ui-scale)) 39%, calc(100% - 9px * var(--ui-scale)) 0,

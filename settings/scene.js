@@ -46,11 +46,19 @@ addEventListener('pagehide', () => void save.flush().catch(() => {}));
 if (scene.view === '21:9' || scene.view === '16:9') {
   const preset = client.settings('preset', scene.presetId);
   const section = document.querySelector('#input-settings').content.firstElementChild.cloneNode(true);
-  const controls = [...section.querySelectorAll('input, select')];
+  const controls = [...section.querySelectorAll('input[type="checkbox"], select')];
   const [keyboard, layout, mouse, motion] = controls;
+  const opacity = section.querySelector('input[name="opacity"]');
+  const opacityValue = section.querySelector('.input-opacity-value');
   const hint = section.querySelector('.input-settings-hint');
   let plugin = state.plugins.find(item => item.id === 'desktop-input');
   let pending = false, revision = 0;
+
+  function showOpacity() {
+    const percentage = `${opacity.value}%`;
+    opacityValue.textContent = percentage;
+    opacity.setAttribute('aria-valuetext', percentage);
+  }
 
   function updateOptions() {
     layout.disabled = !keyboard.checked;
@@ -75,6 +83,8 @@ if (scene.view === '21:9' || scene.view === '16:9') {
       motion.checked = inputDisplay?.mouseMotion !== false;
       layout.value = inputDisplay?.keyboardLayout ?? 'wasd';
       if (!layout.value) layout.value = 'wasd';
+      opacity.value = String(Math.round((inputDisplay?.opacity ?? 1) * 100));
+      showOpacity();
       updateOptions();
     } catch (error) { saveStatus.onError(error); }
   }
@@ -92,6 +102,11 @@ if (scene.view === '21:9' || scene.view === '16:9') {
     saveInput.update({ inputDisplay: { [control.name]: value } }, true);
     updateOptions();
   });
+  opacity.addEventListener('input', () => {
+    showOpacity();
+    saveInput.update({ inputDisplay: { opacity: opacity.valueAsNumber / 100 } });
+  });
+  opacity.addEventListener('change', () => void saveInput.flush().catch(() => {}));
 
   client.onState(value => {
     plugin = value.plugins.find(item => item.id === 'desktop-input');
