@@ -6,7 +6,7 @@ import { ObsSceneBindings } from './obs-bindings.ts';
 import type { ObsSceneEvent } from './obs-bindings.ts';
 import type { InputDisplaySettings } from './input-display.ts';
 const sdkUrl = '/sdk/streamui.js';
-const inputPlugin = 'desktop-input';
+const inputPlugin = 'when.desktop-input';
 const { createClient, getSceneContext, request } = await import(/* @vite-ignore */ sdkUrl) as CoreSdk;
 
 export interface AwaySettings { enabled: boolean; text1: string; text2: string; texts?: string[]; overlayOpacity: number }
@@ -51,19 +51,20 @@ export class HostConnection extends EventTarget {
   private audio: HostState['audio'] = { state: 'idle', error: null, deviceId: null, sampleRate: 48000, channels: 2, deviceSampleRate: 48000, frameRate: 0 };
   private chat: HostState['laplace'] = { state: 'disconnected', error: null, localBridge: false, events: 0, lastEventAt: null };
   private track: NowPlayingTrack | undefined;
-  private readonly presetId = getSceneContext().presetId ?? 'latenite';
+  private presetId = getSceneContext().presetId ?? '';
   private readonly binding = new ObsSceneBindings((id, options) => { void this.client.selectScene(id, options).catch(console.error); }, getSceneContext().preview);
   constructor() {
     super();
     this.client.onState(state => {
       this.core = state;
-      const audio = state.plugins.find(plugin => plugin.id === 'desktop-audio')?.topics.status as { audio?: HostState['audio'] } | undefined;
+      if (!this.presetId) this.presetId = getSceneContext().presetId ?? state.preset?.id ?? 'when.latenite';
+      const audio = state.plugins.find(plugin => plugin.id === 'when.desktop-audio')?.topics.status as { audio?: HostState['audio'] } | undefined;
       if (audio?.audio) this.audio = audio.audio;
-      const track = state.plugins.find(plugin => plugin.id === 'system-media')?.topics.track as NowPlayingTrack | undefined;
+      const track = state.plugins.find(plugin => plugin.id === 'when.system-media')?.topics.track as NowPlayingTrack | undefined;
       if (track) this.track = track;
-      const chat = state.plugins.find(plugin => plugin.id === 'laplace')?.topics.status as HostState['laplace'] | undefined;
+      const chat = state.plugins.find(plugin => plugin.id === 'when.laplace')?.topics.status as HostState['laplace'] | undefined;
       if (chat) this.chat = chat;
-      const obs = state.plugins.find(plugin => plugin.id === 'obs-scenes')?.topics.status as ObsStatus | undefined;
+      const obs = state.plugins.find(plugin => plugin.id === 'when.obs-scenes')?.topics.status as ObsStatus | undefined;
       if (obs) this.updateObs(obs);
       const catalog = JSON.stringify(state.scenes.map(scene => [scene.id, scene.defaults]));
       if (catalog !== this.catalog || !this.visuals) { this.catalog = catalog; void this.readSettings(); }
@@ -73,12 +74,12 @@ export class HostConnection extends EventTarget {
     this.client.on('scene.enter', () => this.sync());
     this.client.on<{ id: string }>('preset.settingsChanged', ({ id }) => { if (id === this.presetId) void this.readSettings(); });
     this.client.on('scene.settingsChanged', () => void this.readSettings());
-    this.client.on<{ audio: HostState['audio'] }>('plugin.desktop-audio.status', value => { this.audio = value.audio; this.sync(); });
-    this.client.on<NowPlayingTrack>('plugin.system-media.track', value => { this.track = value; this.sync(); });
-    this.client.on<HostState['laplace']>('plugin.laplace.status', value => { this.chat = value; this.sync(); });
-    this.client.on<ObsStatus>('plugin.obs-scenes.status', value => this.updateObs(value));
-    this.client.on<ObsSceneEvent>('plugin.obs-scenes.scene-changed', event => this.binding.observe(event));
-    for (const kind of ['message', 'gift', 'superchat']) this.client.on<ChatMessage>('plugin.laplace.chat.' + kind, value => {
+    this.client.on<{ audio: HostState['audio'] }>('plugin.when.desktop-audio.status', value => { this.audio = value.audio; this.sync(); });
+    this.client.on<NowPlayingTrack>('plugin.when.system-media.track', value => { this.track = value; this.sync(); });
+    this.client.on<HostState['laplace']>('plugin.when.laplace.status', value => { this.chat = value; this.sync(); });
+    this.client.on<ObsStatus>('plugin.when.obs-scenes.status', value => this.updateObs(value));
+    this.client.on<ObsSceneEvent>('plugin.when.obs-scenes.scene-changed', event => this.binding.observe(event));
+    for (const kind of ['message', 'gift', 'superchat']) this.client.on<ChatMessage>('plugin.when.laplace.chat.' + kind, value => {
       const numericId = Number(value.user.id);
       this.dispatchEvent(new CustomEvent('chat', { detail: { type: value.kind, origin: value.platform, stableKey: value.id,
         uid: Number.isSafeInteger(numericId) ? numericId : 0, username: value.user.name, userLvl: value.user.level,
@@ -93,10 +94,12 @@ export class HostConnection extends EventTarget {
   }
   private async readSettings(): Promise<void> {
     if (!this.core) return;
+    const presetId = this.presetId || getSceneContext().presetId || this.core.preset?.id || 'when.latenite';
+    this.presetId = presetId;
     const epoch = ++this.epoch, scenes = this.core.scenes;
     try {
       const [visuals, parameters] = await Promise.all([
-        this.client.settings('preset', this.presetId).read<VisualSettings>(),
+        this.client.settings('preset', presetId).read<VisualSettings>(),
         Promise.all(scenes.map(async scene => [scene.id, await this.client.settings('scene', scene.id).read()] as const)),
       ]);
       if (epoch !== this.epoch) return;
@@ -117,7 +120,7 @@ export class HostConnection extends EventTarget {
     const mode: StageMode = normal.view === '16:9' ? '16:9' : '21:9';
     this.state = {
       config: { ...this.visuals, ...values, layoutMode: mode, layout: this.visuals.layoutProfiles[mode] ?? null,
-        audio: { enabled: core.plugins.some(plugin => plugin.id === 'desktop-audio' && plugin.enabled) },
+        audio: { enabled: core.plugins.some(plugin => plugin.id === 'when.desktop-audio' && plugin.enabled) },
         away: { text1: '', text2: '', overlayOpacity: .9, ...away, enabled: covered } },
       audio: this.audio, nowPlaying: this.track, transition, laplace: this.chat,
       inputAvailable: core.plugins.some(plugin => plugin.id === inputPlugin && plugin.state === 'running'),
@@ -132,7 +135,7 @@ export class HostConnection extends EventTarget {
 }
 export const host = new HostConnection();
 export function socketUrl(path: string): string {
-  const url = new URL(path === '/ws/audio' ? '/ws/plugins/desktop-audio/frames' : path, location.origin);
+  const url = new URL(path === '/ws/audio' ? '/ws/plugins/when.desktop-audio/frames' : path, location.origin);
   url.protocol = location.protocol === 'https:' ? 'wss:' : 'ws:'; return url.href;
 }
 export function api<T = void>(path: string, method = 'GET', body?: unknown): Promise<T> { return request<T>(path, method, body); }

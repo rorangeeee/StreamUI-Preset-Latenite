@@ -51,7 +51,7 @@ if (scene.view === '21:9' || scene.view === '16:9') {
   const opacity = section.querySelector('input[name="opacity"]');
   const opacityValue = section.querySelector('.input-opacity-value');
   const hint = section.querySelector('.input-settings-hint');
-  let plugin = state.plugins.find(item => item.id === 'desktop-input');
+  let plugin = state.plugins.find(item => item.id === 'when.desktop-input');
   let pending = false, revision = 0;
 
   function showOpacity() {
@@ -109,7 +109,7 @@ if (scene.view === '21:9' || scene.view === '16:9') {
   opacity.addEventListener('change', () => void saveInput.flush().catch(() => {}));
 
   client.onState(value => {
-    plugin = value.plugins.find(item => item.id === 'desktop-input');
+    plugin = value.plugins.find(item => item.id === 'when.desktop-input');
     updateOptions();
   });
   client.on('preset.settingsChanged', ({ id }) => { if (id === scene.presetId && !pending) void refresh(); });

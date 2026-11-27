@@ -1,9 +1,13 @@
 {
   "formatVersion": 1,
   "sdkVersion": 2,
-  "id": "latenite",
+  "id": "when.latenite",
+  "legacyId": "latenite",
+  "author": "when",
   "name": "LATENITE 多场景",
-  "version": "2.2.7",
+  "version": "3.0.0",
+  "license": "MIT",
+  "fonts": ["Hexin Pixel"],
   "description": "3840 × 2160 双布局，保留弹幕、字标、音频可视化、暂离条带与像素转场。",
   "defaultScene": "ultrawide",
   "defaults": "defaults.json",
@@ -48,29 +52,39 @@
   ],
   "plugins": [
     {
-      "id": "desktop-audio",
-      "minimumVersion": "1.0.3",
-      "required": true
+      "id": "when.desktop-audio",
+      "minimumVersion": "2.0.0",
+      "required": true,
+      "packageUrl": "https://github.com/rorangeeee/StreamUI-Plugin-DesktopAudio/releases/download/v2.0.0/when.desktop-audio.suiplugin",
+      "sha256": "5f31c5543a312679640df7362108599296194cf7744c6c22aa124255beea17fa"
     },
     {
-      "id": "system-media",
-      "minimumVersion": "1.0.2",
-      "required": true
+      "id": "when.system-media",
+      "minimumVersion": "2.0.0",
+      "required": true,
+      "packageUrl": "https://github.com/rorangeeee/StreamUI-Plugin-SystemMedia/releases/download/v2.0.0/when.system-media.suiplugin",
+      "sha256": "23dbca272e4213abdf9d41d50dd580c70bee758c9d33975410e05c1b9fd9cd90"
     },
     {
-      "id": "obs-scenes",
-      "minimumVersion": "1.0.1",
-      "required": true
+      "id": "when.obs-scenes",
+      "minimumVersion": "2.0.0",
+      "required": true,
+      "packageUrl": "https://github.com/rorangeeee/StreamUI-Plugin-ObsScenes/releases/download/v2.0.0/when.obs-scenes.suiplugin",
+      "sha256": "1eb384c1ef4f467c652dd072a9c67841a4ff7b5d708eace3eb23658edc89f823"
     },
     {
-      "id": "laplace",
-      "minimumVersion": "1.0.1",
-      "required": true
+      "id": "when.laplace",
+      "minimumVersion": "2.0.0",
+      "required": true,
+      "packageUrl": "https://github.com/rorangeeee/StreamUI-Plugin-Laplace/releases/download/v2.0.0/when.laplace.suiplugin",
+      "sha256": "f38732926aceef06c250e4055178af99adfdd4e05f3ac051e50d540d857f4f86"
     },
     {
-      "id": "desktop-input",
-      "minimumVersion": "1.0.0",
-      "required": false
+      "id": "when.desktop-input",
+      "minimumVersion": "2.0.0",
+      "required": false,
+      "packageUrl": "https://github.com/rorangeeee/StreamUI-Plugin-DesktopInput/releases/download/v2.0.0/when.desktop-input.suiplugin",
+      "sha256": "6ba15e3dfed022ae45ba8ff52029da7eca843782908b19c8cf84268bd05b7ac4"
     }
   ],
   "repository": "https://github.com/rorangeeee/StreamUI-Preset-Latenite",

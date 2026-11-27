@@ -6,7 +6,7 @@ StreamUICore 0.6.1 / 浏览器 SDK 2 的独立预设。3840 × 2160，包含 21:
 
 在 Core 配置页使用「从 Git 安装」，粘贴本预设的仓库地址即可构建预设。Core 会一并安装 `plugins.txt` 列出的桌面音频、系统曲目、OBS 场景联动和 LAPLACE 弹幕插件。
 
-克隆到 Core/presets/latenite：
+克隆到 Core/presets/when.latenite（或开发短目录 Core/presets/latenite）：
 
 ~~~powershell
 npm ci
@@ -26,7 +26,7 @@ npm test
 
 两个主场景的配置页提供中英文标题和键鼠显示，暂离场景的配置页提供暂离文字。标题和暂离文字均支持添加、移除多段文字并自动保存。
 
-键鼠显示使用可选的「键盘与鼠标输入」插件（`desktop-input`）。把插件克隆到 Core 的 `plugins/desktop-input`，按插件说明构建并启用，再到任一主场景的「键鼠显示」分别开启键盘、鼠标。[插件源码与构建说明](https://github.com/rorangeeee/StreamUI-Plugin-DesktopInput)
+键鼠显示使用可选的「键盘与鼠标输入」插件（`when.desktop-input`）。把插件放入 Core 的 `plugins/when.desktop-input`（或开发目录 `plugins/desktop-input`），按插件说明构建并启用，再到任一主场景的「键鼠显示」分别开启键盘、鼠标。[插件源码与构建说明](https://github.com/rorangeeee/StreamUI-Plugin-DesktopInput)
 
 两个主场景共用显示设置，初始均关闭。键盘支持 WASD、方向键 + Shift / Ctrl、左半区、60、75、98 和 108 配列，鼠标可单独关闭移动箭头。配列按常见 ANSI 物理键位绘制，108 配列包含 104 个标准键和 4 个媒体键。
 
@@ -58,7 +58,7 @@ preset.json 的 trayControls 同时将 controls.away 声明为托盘右键菜单
 
 ON AIR 使用固定字重的字形缓存，在 Canvas 中混合字重、伸缩和倾斜，保留原来的播放时钟与录制闪烁。避免在 OBS 33 的 Chromium 150 中逐帧修改 SF Pro 可变字体轴引起的 SVG 排版阻塞。OBS 33.0.1 的 3840 × 2160 / 120 Hz 独立测试中，10 秒采样由约 10.4 FPS 恢复至约 119.9 FPS，修复后没有超过 33 ms 的帧。
 
-OBS 场景动效使用 obs-scenes 1.0.1 的目标场景事件及转场开始时间，不等待 Stinger 视频结束；预览仍忽略真实 OBS 场景事件。
+OBS 场景动效使用 `when.obs-scenes`（2.0.0+）的目标场景事件及转场开始时间，不等待 Stinger 视频结束；预览仍忽略真实 OBS 场景事件。
 
 更新前提交或暂存自己的源码修改，合并所选 Git 版本后执行 npm ci、npm run build，再刷新预览和 OBS。修改清单结构后刷新列表并重新启用预设。
 
